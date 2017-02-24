@@ -1970,7 +1970,7 @@ read_attr_char:
 
 set_video_mode:
 	testb $0x80, %al	/* preserve screen flag? */
-	jnz set_video_mode_tail
+	jmp set_video_mode_tail
 	call send_ansi_csi
 	movb $0x32, %al		/* 2 */
 	call send_byte
@@ -2332,8 +2332,8 @@ sga_init:
 input_clear_loop:
 	call get_byte
 	jnz input_clear_loop
-	movw $term_init_string, %si
-	call send_asciz_out
+#	movw $term_init_string, %si
+#	call send_asciz_out
 	push $BDA_SEG
 	push $BDA_SEG
 	popw %ds		/* ds = 0x40 */
@@ -2418,37 +2418,37 @@ resize_end:
 	popw %ds		/* ds = cs */
 	call get_byte		/* flush any remaining "wrong" input */
 	jnz resize_end
-	call send_crlf		/* place cursor on start of last line */
-	movw $mfg_string, %si
-	call send_asciz_out
-	call send_crlf
-	movw $prod_string, %si
-	call send_asciz_out
-	call send_crlf
-	movw $long_version, %si
-	call send_asciz_out
-	call send_crlf
+#	call send_crlf	 /* place cursor on start of last line */
+#	movw $mfg_string, %si
+#	call send_asciz_out
+#	call send_crlf
+#	movw $prod_string, %si
+#	call send_asciz_out
+#	call send_crlf
+#	movw $long_version, %si
+#	call send_asciz_out
+#	call send_crlf 
 	/* if vga attached, skip terminal message and bda setup... */
 	CHECK_VGA		/* vga attached? */
 	jz post_bda_init_tail	/* if so, don't modify BDA */
 	/* show detected terminal size, or default if none detected */
 	movw $term_info, %si
-	call send_asciz_out
+#	call send_asciz_out
 	pushw $BDA_SEG
 	popw %ds		/* ds = 0x40 */
 	movb %cs:term_cols, %al
 	movb %al, BDA_COLS	/* 40:4a = number of character cols */
 	movb $0, BDA_CURSOR_COL	/* 40:51 = cursor0 col */
-	call send_number
+#	call send_number
 	movb $0x78, %al		/* x */
-	call send_byte
+#	call send_byte
 	movb %cs:term_rows, %al
 	movb %al, %ah
 	decb %ah		/* ah = rows-1 */
 	movb %ah, BDA_ROWS	/* 40:84 = number of character rows - 1 */
 	movb %ah, BDA_CURSOR_ROW	/* 40:50 = cursor0 row */
-	call send_number
-	call send_crlf
+#	call send_number
+#	call send_crlf
 	movb $3, BDA_MODE_NUM
 	movb $0x29, BDA_MODE_SEL
 	movw $VGA_IO_BASE, BDA_6845_ADDR
@@ -2481,15 +2481,15 @@ post_bda_init_tail:
 	pushw %cs
 	popw %ds
 	movw $ebda_info, %si
-	call send_asciz_out
+#	call send_asciz_out
 	movw %cs:sgabios_ebda_logbuf_offset, %ax
 	xchgb %ah, %al
-	call send_number
+#	call send_number
 	movb $0x20, %al
-	call send_byte
+#	call send_byte
 	movb %ah, %al
-	call send_number
-	call send_crlf
+#	call send_number
+#	call send_crlf
 post_bda_init_skipsgabioslog:
 	popw %es
 	popw %ds
